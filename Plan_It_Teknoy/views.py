@@ -48,7 +48,8 @@ import webbrowser
 # pip install docx2pdf
 from docx2pdf import convert
 # file manipulation
-import win32com.client
+
+# import win32com.client
 import os
 import pythoncom
 
