@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    {% load notifications_tags %}
+    <head>
+        <meta name="description" content="Event Dashboard" />
+        <!-- Twitter meta-->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" content="@sajib1066" />
+        <meta property="twitter:creator" content="@sajib1066" />
+        <!-- Open Graph Meta-->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Vali Admin" />
+        <meta property="og:title" content="Vali - Free Bootstrap 4 admin theme" />
+        <meta property="og:url" content="https://sajib1066.github.io/" />
+        <meta property="og:image" content="https://sajib1066.github.io/images/me.jpg" />
+        <meta property="og:description" content="Event Dashboard" />
+        <title>{% block title %}{% endblock title  %}</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Main CSS-->
+        <link rel="icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+        <!-- Font-icon css-->
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <!-- {% block extracss %}
+        {% endblock extracss %} -->
+        <style>
+            .notification {
+              color: white;
+              text-decoration: none;
+              padding: 15px 26px;
+              position: relative;
+              display: inline-block;
+              border-radius: 2px;
+            }
+             
+            .badge {
+              position: absolute;
+              top: 2px;
+              right: 30px;
+              padding: 5px 10px;
+              border-radius: 50%;
+              background-color: red;
+              color: white;
+            }
+
+        </style>
+    </head>
+    <body class="app sidebar-mini">
+        <!-- Navbar-->
+        <header class="app-header">
+            <a class="app-header__logo" href="{% url 'Plan_It_Teknoy:index_view' %}"><img src="{% static 'images/LogoMain.png' %}" width="150px" alt="application logo"></a>
+            <!-- Sidebar toggle button-->
+            <a class="app-sidebar__toggle" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
+            <!-- Navbar Right Menu-->
+            <ul class="app-nav">
+                <!--Notification Menu-->
+                <li class="dropdown">
+                    <a id="badgeOff" class="app-nav__item notification" href="#" data-toggle="dropdown" aria-label="Show notifications" onclick="badger()"><i class="fa fa-bell-o fa-lg"></i>
+                            {% if user.notifications.unread.exists %}
+                        <span class="badge" id="badgeOff" onclick="badger()" >!</span>
+                            {% endif %}
+                            
+                    </a>
+                    <ul class="app-notification dropdown-menu dropdown-menu-right">
+                        <li class="app-notification__title">You have {% live_notify_badge %} notifications.</li>
+                        <div class="app-notification__content">
+                            {% for notification in user.notifications.unread %}
+                            <li>
+                                <a class="app-notification__item" href="javascript:;">
+                                    <span class="app-notification__icon">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                                            <i class="fa fa-calendar-o fa-stack-1x fa-inverse"></i></span>
+                                    </span>
+                                    <div>
+                                        <p class="app-notification__message">The event <strong><i>{{ notification.verb }}</i></strong> {{ notification.description }}</p>
+                                        <p class="app-notification__meta">{{ notification.timestamp }}</p>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endfor %}
+                            {% live_notify_list list_class="dropdown-menu" %}
+                            <!-- </div> -->
+                        </div>
+                        <li class="app-notification__footer"><a href="#">See all notifications.</a></li>
+                    </ul>
+                </li>
+                <!-- User Menu-->
+                <li class="dropdown">
+                    <!-- signout button -->
+                    <a class="app-nav__item" href="{% url 'Plan_It_Teknoy:Logout' %}"><i class="fa fa-sign-out fa-lg"></i></a>
+                    <!-- <ul class="dropdown-menu settings-menu dropdown-menu-right"> -->
+                        <!-- <li> -->
+                            <!-- for testing only -->
+                            <!-- NOTE: need pa ug condition if ang user kay student or teacher para maka proceed sa settings -->
+                            <!-- for now student setting pa ang ma display -->
+                            
+                            <!-- <a class="dropdown-item" href="{% url 'Plan_It_Teknoy:sprofile-settings_view' %}"><i class="fa fa-user fa-lg"></i> Profile</a>
+                        </li> -->
+                        <!-- Signout Button -->
+                        <!-- <li>
+                            <a class="dropdown-item" href="{% url 'Plan_It_Teknoy:Logout' %}"><i class="fa fa-sign-out fa-lg"></i> Sign Out</a>
+                        </li>
+                    </ul> -->
+                </li>
+            </ul>
+        </header>
+        <!-- Sidebar menu-->
+        <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+        <aside class="app-sidebar">
+            <div class="app-sidebar__user">
+                    <!-- {% for student_records in student_record %}
+                        {% if student_records.profile_pic.url in student_records.profile_pic.url %}
+                        <img class="app-sidebar__user-avatar" src="{{student_records.profile_pic.url}}" alt="User Image" height="50px" width="50px"/>            
+                        {% else %}
+                        <img class="app-sidebar__user-avatar" src="{% static 'images/default.png' %}" alt="User Image" height="50px" width="50px"/>
+                        {% endif %} -->
+                        <img class="app-sidebar__user-avatar" src="{% static 'images/default.png' %}" alt="User Image" height="50px" width="50px"/>
+                <div>
+                    <!-- User Name -->
+                        <!-- <p class="app-sidebar__user-name">{{student_records.first_name}} {{student_records.last_name}}</p>
+                        {% if student_records.year_level == 1 %}
+                        <p class="app-sidebar__user-designation">{{student_records.program}} - {{student_records.year_level}}</p>
+                        {% elif student_records.year_level == 2 %}
+                        <p class="app-sidebar__user-designation">{{student_records.program}} - {{student_records.year_level}}</p>
+                        {% elif student_records.year_level == 3 %}
+                        <p class="app-sidebar__user-designation">{{student_records.program}} - {{student_records.year_level}}</p>
+                        {% else %}
+                        <p class="app-sidebar__user-designation">{{student_records.program}} - {{student_records.year_level}}</p>
+                        {% endif %}
+                    {% endfor %} -->
+
+                        <!-- Full Name and Avatar from ms account -->
+                        <p class="app-sidebar__user-name">{{name}}</p>
+                </div>
+            </div>
+            <ul class="app-menu">
+                <li>
+                    <a class="app-menu__item" href="{% url 'Plan_It_Teknoy:dashboard_view' %}"><i class="app-menu__icon fa fa-dashboard"></i><span class="app-menu__label">Dashboard</span></a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="{% url 'Plan_It_Teknoy:calendar_view' %}"><i class="app-menu__icon fa fa-calendar"></i><span class="app-menu__label">Calendar</span></a>
+                </li>
+                <li class="treeview">
+                    <a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-th-list"></i><span class="app-menu__label">Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a class="treeview-item" href="{% url 'Plan_It_Teknoy:running_events' %}"><i class="icon fa fa-circle-o"></i> Running</a>
+                        </li>
+                        <li>
+                            <a class="treeview-item" href="{% url 'Plan_It_Teknoy:completed_events' %}"><i class="icon fa fa-circle-o"></i> Completed</a>
+                        </li>
+                        <li>
+                            <a class="treeview-item" href="{% url 'Plan_It_Teknoy:all_events' %}"><i class="icon fa fa-circle-o"></i> All</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- announcements sidemenu -->
+                <!-- <li>
+                    <a class="app-menu__item" href="{% url 'Plan_It_Teknoy:announcements_view' %}"><i class="app-menu__icon fa fa-bullhorn"></i><span class="app-menu__label">Announcements</span></a>
+                </li> -->
+                <!-- end sidemenu -->
+                <li>
+                    <a class="app-menu__item" href="{% url 'Plan_It_Teknoy:docgen_view' %}"><i class="app-menu__icon fa fa-file-code-o"></i><span class="app-menu__label">Document Generator</span></a>
+                </li>
+            </ul>
+        </aside>
+        <main class="app-content">
+            <div class="app-title">
+                {% block breadcrumb %}
+                {% endblock breadcrumb %}
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </main>
+        <!-- Essential javascripts for application to work-->
+        {% include 'base/js.html' %}
+        <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
+        {% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
+        {% block extrascripts %}
+        {% endblock extrascripts %}
+        <script>
+            function badger(){
+                const badgeOff = document.querySelector('.badge');
+                badgeOff.addEventListener('click', (event) => {
+                    event.target.remove();
+                });
+                //document.getElementsByClassName('badge').style.display = "none";
+            //    var badgeOff = document.getElementByClassName("badge");
+            //    
+            //    localStorage.setItem("seen_badge", "false");
+            //        if(localStorage.seen_badge === "false") {
+            //        $('.badge').show();
+            //        }   
+            //        $('.badge').on('click', function(){
+            //            $(this).hide();
+            //            localStorage.seen_badge = "true";
+            //        });
+           //   var badgeOff = document.getElementById("badge").value;
+           //   document.getElementById("newPassword").value = input;
+           //   const button = document.querySelector('#btnSubmitPassword');
+           //   button.disabled = false;
+            }
+       </script>
+    </body>
+</html>

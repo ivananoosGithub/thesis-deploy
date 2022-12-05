@@ -1,0 +1,155 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}">
+	<link rel="stylesheet" href="{% static 'css/signin.css' %}">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/a81368914c.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Plan'it Teknoy | Sign In</title>
+</head>
+<body>
+	<!-- <div class="container">
+    {% for message in messages %}
+      <div id="errorDiv"style="margin: auto; width: 300px; border-radius: 5px; position: absolute;
+              background-color: white; z-index: 1; transform: translate(158%, 128%);"> 
+        <p class="{{ message.tags }}" style="color: rgb(201, 44, 44); font-weight: bold; text-align: center; font-family: Arial; margin-top: 10px; padding: 5px;">
+          {% if 'login' in message.tags %}
+            {{ message }}
+          {% else %}
+            {{ message }}
+          {% endif %}
+        </p>
+          {% endfor %}
+        </div>
+    </div> -->
+	<div class="div">
+		<a href="{% url 'Plan_It_Teknoy:Home' %}"></a>
+		<img class="logo" id="logo" src="{% static 'images/LogoMain.png' %}" alt="">
+	</div>
+
+    <div class="sign-container">
+      <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 text-light text-center">
+          <h5>Thank you for authenticating your email address. You can now reset your password.</h5>
+        </div>
+        <div class="col-3"></div>
+      </div>
+      <div class="login-content">
+        <form action="" method="POST" autocomplete="off" enctype="multipart/form-data">
+          {% csrf_token %}
+                 <div class="input-div pass">
+                    <div class="i"> 
+                       <i class="fa fa-envelope"></i>
+                    </div>
+                    <div class="div">
+                       <!-- <input type="email" class="input" id="email" name = "email" required> -->
+                       <input class="input" name="email" type="email" value ={{email}} readonly>
+                   </div>
+                </div>
+
+                <div class="input-div pass">
+                  <div class="i"> 
+                    <i class="fas fa-lock"></i>
+                  </div>
+                <div class="div password-container">
+                  <!-- <input type="password" class="input" id="password" name = "password" required> -->
+                  <input class="input" name="password" type="password" placeholder="Password" id="password"  oninput="check()">
+                  <i class="fa-solid fa-eye" id="eye"></i>
+                </div>
+              </div>
+              <div class="u-align-center u-form u-form-3">
+                <div id ="check0" style="color: white; padding-top: 3%;" align ="left">
+                  <i class = "far fa-check-circle"></i> Length more than 8.
+                </div>
+                <div id ="check2" style="color: white; padding-top: 2%;" align ="left">
+                  <i class = "far fa-check-circle" style="padding-top: 2%;"></i> Contains numerical character.
+                </div>
+                <div id ="check3" style="color: white; padding-top: 2%;" align ="left">
+                  <i class = "far fa-check-circle" style="padding-top: 2%;" ></i> Contains special character.
+                </div>
+                <div id ="check4" style="color: gold; padding: 2% 0 3%" align ="left">
+                  <i class = "far fa-check-circle" style="padding-top: 2%;" ></i>  Shouldn't contain spaces.
+                </div>
+              </div>
+              <div class="input-div pass">
+                <div class="i"> 
+                  <i class="fas fa-lock"></i>
+                </div>
+              <div class="div password-container">
+                <!-- <input type="password" class="input" id="password" name = "password" required> -->
+                <input class="input" name="cpassword" type="password" placeholder="Confirm Password" id="confirmPassword">
+                <i class="fa-solid fa-eye" id="confirmEye"></i>
+              </div>
+            </div>
+            <br>
+            <button type="submit" class="btn" id="btnResetPassword" value="Reset password">Reset Password</button>
+        </form>
+      </div>
+    </div>
+    
+    <script>
+      const passwordField = document.querySelector("#password");
+      const eyeIcon= document.querySelector("#eye");
+  
+      eye.addEventListener("click", function(){
+      this.classList.toggle("fa-eye-slash");
+      const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+      passwordField.setAttribute("type", type);
+      })
+
+      function check(){
+      var input = document.getElementById("password").value;
+      document.getElementById("password").value = input;
+
+
+      if(input.length >= 8){
+         document.getElementById("check0").style.color="gold";
+      }else{
+        var check0 = document.getElementById("check0").style.color="white";
+      }
+
+      if(input.match(/[0-9]/i)){
+        document.getElementById("check2").style.color="gold";
+      }else{
+        var check2 = document.getElementById("check2").style.color="white";
+      }
+
+      if(input.match(/[^A-Za-z0-9-'']/i)){
+        document.getElementById("check3").style.color="gold";
+      }else{
+        var check3 = document.getElementById("check3").style.color="white";  
+      }
+
+      if(input.match(' ')){
+        document.getElementById("check4").style.color="white";
+      }else{
+        var check4 = document.getElementById("check4").style.color="gold";
+      }
+
+    }
+    </script>
+  
+    <script>
+      const confirmPasswordField = document.querySelector("#confirmPassword");
+      const confirmEyeIcon= document.querySelector("#confirmEye");
+  
+      confirmEye.addEventListener("click", function(){
+      this.classList.toggle("fa-eye-slash");
+      const type = confirmPasswordField.getAttribute("type") === "password" ? "text" : "password";
+      confirmPasswordField.setAttribute("type", type);
+      })
+
+    </script>
+
+       <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'js/signin.js' %}"></script>
+</body>
+</html>

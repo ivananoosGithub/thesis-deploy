@@ -1,0 +1,115 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Plan'it Teknoy | Announcements{% endblock title %}
+
+{% block breadcrumb %}
+    <div>
+        <h1><i class="fa fa-dashboard"></i> Announcements</h1>
+        <p>Announcements and News</p>
+    </div>
+    <ul class="app-breadcrumb breadcrumb">
+        <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
+        <li class="breadcrumb-item"><a href="{% url 'Plan_It_Teknoy:announcements_view' %}">Announcements</a></li>
+    </ul>
+{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- Main Content -->
+    <div class="col-md-12">
+        <div class="tile">
+            <!-- Data Table Style -->
+            
+<!--             <div class="tile-body">
+                <div class="table-responsive">
+                    <div id="sampleTable_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-bordered dataTable no-footer" id="sampleTable" role="grid" aria-describedby="sampleTable_info">
+                                    <thead>
+                                        <tr role="row">
+                                            <th class="sorting" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 300.312px; text-align: center;">Announcement</th>
+                                            <th class="sorting_asc" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 85px; text-align: center;">Posted by:</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                            <tr role="row" class="odd">
+                                                <td>asdasdasd</td>
+                                                <td>asd</td>
+                                            </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Data table end -->
+
+<!--             <hr> -->
+
+            <!-- main contents block style -->
+<!--             <div class="announcement-holder">
+                <h2>Sample Headline</h2>
+                <p class="font-italic">November 2, 2022 | 4:20 pm</p>
+                <img src="" alt="">
+                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Odit blanditiis facilis ab est ea voluptatem eum itaque, 
+                accusantium incidunt esse ratione, velit vitae laborum placeat, illo sunt similique eveniet omnis?
+                </p>
+                <p class="text-right">Announcement by: <span class="font-italic">Sample Admin</span></p>
+            </div> -->
+            <!-- end content -->
+
+            <div class="card">
+                <h5 class="card-header">Announcements and News</h5>
+                <div class="card-body">
+                    <h3 class="card-title">Enable Plan'it Teknoy's announcement feature</h3>
+                    <ol>
+                        <li>Click on the discord widget located at the bottom-right corner of the screen</li>
+                        <li></li>
+                        <li></li>
+                    </ol>
+                    <p class="card-text"></p>
+                </div> 
+            </div>
+
+            <!-- card style -->
+            <!-- {{message}} 
+            {% for test in test %}
+            <div class="card">
+                <h5 class="card-header">{{ test.Time }}</h5>
+                <div class="card-body">
+                    <h2 class="card-title">{{ test.Message }}</h2>
+                    <p>Announcement by: <span class="font-italic">{{ test.Username }}</span></p>
+                    <p class="card-text">{{ test.Message }}</p>
+                    <a href="#" class="btn btn-danger">View Source</a>
+                    {% if image_check %}
+                    <img style="width: 40%;" class="rounded mx-auto d-block" src="{{test.Image}}" alt="announcement image">
+                    {% endif %}
+                    <img style="width: 40%;" class="rounded mx-auto d-block" src="{% static 'images/announcement-1.jpg' %}" alt="announcement image">
+                </div> 
+            </div>
+            {% endfor %}  -->
+            <!-- end card style -->
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block extrascripts %}
+<!-- code for announcements -->
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '1037241162597154856',
+    channel: '1037241163226296383'
+  })
+</script>
+    <script type="text/javascript" src="{% static 'js/plugins/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript">$('#sampleTable').DataTable();</script>
+{% endblock extrascripts %}
