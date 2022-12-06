@@ -858,7 +858,26 @@ class CalendarViewNew(View):
 
 
 	def post(self, request):
-		user = graph.get_user()        
+		config = configparser.ConfigParser()
+
+		email = request.session['username']
+		password = request.session['password']
+		# config.read(['config.cfg', 'config.dev.cfg'])
+		config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+		'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+		'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+		'verificationUri' : 'https://microsoft.com/devicelogin',
+		'userCode' : 'TEKNOY',
+		'expiresOn' : '2022-12-30 09:26:03.478039',
+		'username': email,
+		'password': password,
+		'redirectUri' : 'http://localhost:8000/'}
+		azure_settings = config['azure']
+
+		graph: Graph = Graph(azure_settings)
+		user = graph.get_user()          
 		form2 = EventForm(request.POST or None)        
 		if request.POST and form2.is_valid():
 			current_user = user['id']
