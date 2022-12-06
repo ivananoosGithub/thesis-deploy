@@ -72,10 +72,17 @@
         </div>
         <div class="u-custom-menu u-nav-container">
           <ul class="u-custom-font u-font-montserrat u-nav u-unstyled u-nav-1">
+            {% if current_user %}
+            <li class="u-nav-item"><a
+                class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
+                href="{% url 'Plan_It_Teknoy:index_view' %}" style="padding: 10px 20px;">Home</a>
+            </li>
+            {% else %}
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
                 href="{% url 'Plan_It_Teknoy:Home' %}" style="padding: 10px 20px;">Home</a>
             </li>
+            {% endif %}
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
                 href="{% url 'Plan_It_Teknoy:About' %}" style="padding: 10px 20px;">About</a>
@@ -91,8 +98,15 @@
             <div class="u-inner-container-layout u-sidenav-overflow">
               <div class="u-menu-close"></div>
               <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'Plan_It_Teknoy:Home' %}">Home</a>
+                {% if current_user %}
+                <li class="u-nav-item"><a class="u-button-style u-nav-link"
+                    href="{% url 'Plan_It_Teknoy:index_view' %}">Home</a>
                 </li>
+                {% else %}
+                <li class="u-nav-item"><a class="u-button-style u-nav-link"
+                    href="{% url 'Plan_It_Teknoy:Home' %}">Home</a>
+                </li>
+                {% endif %}
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'Plan_It_Teknoy:About' %}">About</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'Plan_It_Teknoy:contact_view' %}">Contact</a>
@@ -126,7 +140,7 @@
         data-page-id="225305269"><img src="{% static 'images/6.png' %}" alt=""></span>
 
         {% if current_user %}  <!-- Palihog ko og design <3 -- -->
-          <h3><a href="{% url 'Plan_It_Teknoy:logout' %}">LOGOUT</a></h3>
+          <h3><a href="{% url 'Plan_It_Teknoy:Logout' %}">LOGOUT</a></h3>
           {% else %}
           {% endif %}
 
@@ -170,7 +184,9 @@
                         class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-font-montserrat u-radius-10 u-btn-1">Submit</a>
                       <input type="submit" value="submit" class="u-form-control-hidden">
                     </div>
-                   <div class="u-form-send-error u-form-send-message">Thank you! Your message has been sent.</div>
+                    <div class="u-form-send-message u-form-send-success u"> Thank you! Your message has been sent. </div>
+                   <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors
+                      then try again. </div>
                     <input type="hidden" value="" name="recaptchaResponse">
                   </form>
                 </div>

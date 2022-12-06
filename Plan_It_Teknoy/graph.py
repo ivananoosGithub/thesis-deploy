@@ -1,12 +1,12 @@
 import json
 import configparser
 from configparser import SectionProxy
-from azure.identity import DeviceCodeCredential, ClientSecretCredential
+from azure.identity import ClientSecretCredential, UsernamePasswordCredential
 from msgraph.core import GraphClient
 
 class Graph:
 	settings: SectionProxy
-	device_code_credential: DeviceCodeCredential
+	device_code_credential: UsernamePasswordCredential
 	user_client: GraphClient
 	client_credential: ClientSecretCredential
 	app_client: GraphClient
@@ -15,9 +15,11 @@ class Graph:
 		self.settings = config
 		client_id = self.settings['clientId']
 		tenant_id = self.settings['authTenant']
+		username = self.settings['username']
+		password = self.settings['password']
 		graph_scopes = self.settings['graphUserScopes'].split(' ')
 
-		self.device_code_credential = DeviceCodeCredential(client_id, tenant_id = tenant_id)
+		self.device_code_credential = UsernamePasswordCredential(client_id = client_id, username=username, password=password)
 		self.user_client = GraphClient(credential=self.device_code_credential, scopes=graph_scopes)
 
 	def get_user_token(self):

@@ -82,19 +82,17 @@
         </div>
         <div class="u-custom-menu u-nav-container">
           <ul class="u-custom-font u-font-montserrat u-nav u-unstyled u-nav-1">
-
-            {% if name %}
+            {% if current_user %}
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
                 href="{% url 'Plan_It_Teknoy:index_view' %}" style="padding: 10px 20px;">Home</a>
             </li>
             {% else %}
             <li class="u-nav-item"><a
-              class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
-              href="{% url 'Plan_It_Teknoy:Home' %}" style="padding: 10px 20px;">Home</a>
+                class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
+                href="{% url 'Plan_It_Teknoy:Home' %}" style="padding: 10px 20px;">Home</a>
             </li>
             {% endif %}
-            
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
                 href="{% url 'Plan_It_Teknoy:About' %}" style="padding: 10px 20px;">About</a>
@@ -110,15 +108,13 @@
             <div class="u-inner-container-layout u-sidenav-overflow">
               <div class="u-menu-close"></div>
               <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
-                {% if name %}
-                <li class="u-nav-item"><a
-                    class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
-                    href="{% url 'Plan_It_Teknoy:index_view' %}" style="padding: 10px 20px;">Home</a>
+                {% if current_user %}
+                <li class="u-nav-item"><a class="u-button-style u-nav-link"
+                    href="{% url 'Plan_It_Teknoy:index_view' %}">Home</a>
                 </li>
                 {% else %}
-                <li class="u-nav-item"><a
-                  class="u-button-style u-nav-link u-text-active-custom-color-3 u-text-hover-custom-color-3"
-                  href="{% url 'Plan_It_Teknoy:Home' %}" style="padding: 10px 20px;">Home</a>
+                <li class="u-nav-item"><a class="u-button-style u-nav-link"
+                    href="{% url 'Plan_It_Teknoy:Home' %}">Home</a>
                 </li>
                 {% endif %}
                 <li class="u-nav-item"><a class="u-button-style u-nav-link"
@@ -156,11 +152,6 @@
         data-href="{% url 'Plan_It_Teknoy:signin_view' %}" data-page-id="225305269"><img src="{% static 'images/6.png' %}"
           alt=""></span>
 
-      {% if current_user %}
-      <!-- Palihog ko og design <3 -- -->
-      <h3><a href="{% url 'Plan_It_Teknoy:logout' %}">LOGOUT</a></h3>
-      {% else %}
-      {% endif %}
 
     </div>
   </header>
@@ -173,6 +164,7 @@
             data-animation-name="customAnimationIn" data-animation-duration="2000" data-animation-out="0">Plan'it <span
               class="u-text-custom-color-3">Teknoy</span> is Different
           </h1>
+
           <h5 class="u-align-center u-custom-font u-font-montserrat u-text u-text-2"
             data-animation-name="customAnimationIn" data-animation-duration="2000" data-animation-out="0"
             data-animation-delay="500">This application's end goal is to implement student planner with a dynamic 

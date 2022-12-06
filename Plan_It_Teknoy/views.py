@@ -10,11 +10,10 @@ from passlib.hash import pbkdf2_sha256
 from django.core.mail import send_mail
 from django.conf import settings
 from datetime import *
-from abc import ABC, abstractmethod
 
 #notification feature
+# pip install django-notifications-hq
 from notifications.signals import notify
-
 
 
 import uuid
@@ -43,29 +42,35 @@ import threading
 # pip install python-docx
 from docx import Document
 from docx.shared import Inches
-
 import webbrowser
 # pip install docx2pdf
 from docx2pdf import convert
 # file manipulation
-
-# import win32com.client
+#import win32com.client
 import os
-# import pythoncom
+#import pythoncom
+
+
 
 
 # important don't delete
 
-config = configparser.ConfigParser()
-# config.read(['config.cfg', 'config.dev.cfg'])
-config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
-'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
-'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
-'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
-'graphUserScopes' : 'User.Read Mail.Read Mail.Send' }
-azure_settings = config['azure']
+# config = configparser.ConfigParser()
+# # config.read(['config.cfg', 'config.dev.cfg'])
+# config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+# 'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+# 'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+# 'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+# 'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+# 'verificationUri' : 'https://microsoft.com/devicelogin',
+# 'userCode' : 'TEKNOY',
+# 'expiresOn' : '2022-12-30 09:26:03.478039',
+# 'username': 'abc',
+# 'password': 'abc',
+# 'redirectUri' : 'http://localhost:8000/'}
+# azure_settings = config['azure']
 
-graph: Graph = Graph(azure_settings)
+# graph: Graph = Graph(azure_settings)
 
 
 
@@ -74,32 +79,43 @@ graph: Graph = Graph(azure_settings)
 # Logout current_user session
 def logout(request):
 	try:
-		del request.session['user']
+		del request.session['username']
+		del request.session['password']
 	except:
 		return redirect('Plan_It_Teknoy:Home')
 	return redirect('Plan_It_Teknoy:Home')
 
 # Home and Landing Page
-def home(response):
-	return render(response, "Home.html", {})
+def home(request):
+	if 'user_session' in request.session:
+		current_user = request.session['user_session']
+
+		context = {'current_user':current_user}
+		return render(request, "Home.html", context)
+	else:
+		return render(request, "Home.html", {})
+
+# Home View
+# class HomeView(View):
+# 	def get(self, request):
+# 		if 'user' in request.session:
+# 			current_user = request.session['user']
+
+# 			context = {'current_user':current_user}
+# 		return render(response, "Home.html", context)
+# 	else:
+# 		return render(response, "Home.html", {})
+
 
 # About Us Page
-def about(response):
-	user = graph.get_user()
-	name = user['displayName']
-	email = user['mail']
-	user_id = user['id']
-	principal_name = user['userPrincipalName']
-	
-	context = {
-		'user_id':user_id,
-		'email':email,
-		'principal_name':principal_name,
-		'user': user,
-		'name': name,
-	}
-	return render(response, "About.html", context)
+def about(request):
+	if 'username' in request.session:
+		current_user = request.session['username']
 
+		context = {'current_user':current_user}
+		return render(request, "About.html", context)
+	else:
+		return render(request, "About.html", {})
 
 # Password Reset Send Mail Function
 def send_forget_password_mail(email):
@@ -128,23 +144,49 @@ def listToString(s):
 # (After Microsoft) Index View
 class IndexView(View):
 	def get(self, request):
-		user = graph.get_user()
-		name = user['displayName']
-		email = user['mail']
-		user_id = user['id']
-		principal_name = user['userPrincipalName']
+		if 'username' in request.session:
+			config = configparser.ConfigParser()
+
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
+
+			graph: Graph = Graph(azure_settings)
+
+			user = graph.get_user()
+			name = user['displayName']
+			email = user['mail']
+			user_id = user['id']
+			principal_name = user['userPrincipalName']
+			s = requests.Session()
 		
-		context = {
-			'user_id':user_id,
-			'email':email,
-			'principal_name':principal_name,
-			'user': user,
-			'name': name,
-		}
-		return render(request, 'Home.html', context)
+			context = {
+				'user_id':user_id,
+				'email':email,
+				'principal_name':principal_name,
+				'user': user,
+				'name': name,
+			}
+			return render(request, 'Home.html', context)
+		else:
+			return render(request, 'signin.html', {})
 		
 	def post(self,request):
 		if 'btnAddStudent' in request.POST:
+			user_session = request.POST.get('user_session')
+			request.session['user_session'] = user_session
 			if request.POST.get('student_email') and request.POST.get('student_fullname') and request.POST.get('student_id'):
 				
 				add_user = Users()
@@ -305,6 +347,26 @@ class DocGenView(View):
 	def get(self, request, *args, **kwargs):
 		form = EventForm(request.POST or None)
 		
+		config = configparser.ConfigParser()
+
+		email = request.session['username']
+		password = request.session['password']
+		# config.read(['config.cfg', 'config.dev.cfg'])
+		config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+		'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+		'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+		'verificationUri' : 'https://microsoft.com/devicelogin',
+		'userCode' : 'TEKNOY',
+		'expiresOn' : '2022-12-30 09:26:03.478039',
+		'username': email,
+		'password': password,
+		'redirectUri' : 'http://localhost:8000/'}
+		azure_settings = config['azure']
+
+		graph: Graph = Graph(azure_settings)
+
 		user = graph.get_user()
 		name = user['displayName']
 		current_user = user['id']
@@ -353,18 +415,19 @@ class DocGenView(View):
 				document.add_paragraph(content)
 				file = document.save(filename + ".docx")
 				conv = filename + ".docx"
-				convert(conv)
+				pdf = convert(conv)
 
 				add_doc = DocumentGen()
 				add_doc.filename = filename
 				add_doc.content = content
+				add_doc.doc_file = request.FILES['pdf']
 				add_doc.save()       
 
 				return redirect('Plan_It_Teknoy:docgen_view')
 			if 'btnViewDocument' in request.POST:
 				getfile = request.POST.get('docview')
 				# temporary file browsing / please replace to local drive when using
-				webbrowser.open_new_tab(f'A:/GitHub/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
+				webbrowser.open_new_tab(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
 				return redirect('Plan_It_Teknoy:docgen_view')
 
 			if 'btnDeleteDocument' in request.POST:
@@ -373,8 +436,8 @@ class DocGenView(View):
 				docdeletefile = request.POST.get('docdelete')
 				DocumentGen.objects.filter(DocumentID = docdeletefile).delete()
 				# local drive, please change appropriately
-				os.remove(f'A:/GitHub/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
-				os.remove(f'A:/GitHub/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile2}')
+				os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
+				os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile2}')
 				return redirect('Plan_It_Teknoy:docgen_view')
 
 
@@ -388,8 +451,8 @@ class SelectRoleView(View):
 # Contact Us page
 class contactView(View):
 	def get(self, request): 
-		if 'user' in request.session:
-			current_user = request.session['user']
+		if 'username' in request.session:
+			current_user = request.session['username']
 			students = Students.objects.filter(StudentID=current_user)     
 			users = Users.objects.filter(id_number=current_user)
 
@@ -416,7 +479,58 @@ class contactView(View):
 			messages.info(request, 'Please complete the fields', extra_tags='try')
 			return redirect('Plan_It_Teknoy:contact_view')
 
-# Sign in page
+# # Sign in page
+# class SignInView(View):
+# 	def get(self, request):
+# 		if 'user' in request.session:
+# 			current_user = request.session['user']
+# 			students = Students.objects.filter(StudentID=current_user)
+# 			teachers = Teachers.objects.filter(TeacherID=current_user) 
+# 			users = Users.objects.filter(id_number=current_user)
+
+# 			context = {
+# 				'current_user': current_user,
+# 				'students' : students,
+# 				'teachers' : teachers,
+# 				'users' : users,
+# 			}
+# 			return render(request, 'signin.html', context)
+# 		else:
+# 			return render(request, 'signin.html', {})
+	
+# 	def post(self, request):
+# 		if request.method == 'POST':
+# 			if 'btnSignIn' in request.POST:
+# 				id_number = request.POST.get('id_number')
+# 				email = request.POST.get("email")
+# 				password = request.POST.get('password')
+# 				check_password = Users.objects.filter(id_number=id_number).values_list("password",flat=True)
+# 				listpw = list(check_password)
+# 				dec_password = pbkdf2_sha256.verify(password, listToString(listpw))
+# 				check_id = Users.objects.filter(id_number=id_number)
+
+# 				check_email = Users.objects.filter(email=email)
+# 				if check_id and dec_password and check_email:
+# 					request.session['user'] = id_number
+# 					if Users.objects.filter(id_number=id_number).count()>0:
+# 						return redirect('Plan_It_Teknoy:dashboard_view')
+# 				else:
+# 					# does not display
+# 					messages.info(request, 'Incorrect ID Number and Email and Password!')
+# 					return redirect('Plan_It_Teknoy:signin_view') 
+
+# 			elif 'btnForgotPass' in request.POST:
+# 				email = request.POST.get("email")
+
+# 				if Users.objects.filter(email=email).count()>0:                   
+# 					request.session['email'] = email
+# 					send_forget_password_mail(email)
+# 					# add text that says email sent
+# 					return redirect('Plan_It_Teknoy:signin_view')
+
+# 				# add else if email not in db
+# 				return redirect('Plan_It_Teknoy:contact_view')
+
 class SignInView(View):
 	def get(self, request):
 		if 'user' in request.session:
@@ -438,23 +552,11 @@ class SignInView(View):
 	def post(self, request):
 		if request.method == 'POST':
 			if 'btnSignIn' in request.POST:
-				id_number = request.POST.get('id_number')
 				email = request.POST.get("email")
 				password = request.POST.get('password')
-				check_password = Users.objects.filter(id_number=id_number).values_list("password",flat=True)
-				listpw = list(check_password)
-				dec_password = pbkdf2_sha256.verify(password, listToString(listpw))
-				check_id = Users.objects.filter(id_number=id_number)
-
-				check_email = Users.objects.filter(email=email)
-				if check_id and dec_password and check_email:
-					request.session['user'] = id_number
-					if Users.objects.filter(id_number=id_number).count()>0:
-						return redirect('Plan_It_Teknoy:dashboard_view')
-				else:
-					# does not display
-					messages.info(request, 'Incorrect ID Number and Email and Password!')
-					return redirect('Plan_It_Teknoy:signin_view') 
+				request.session['username'] = email
+				request.session['password'] = password
+				return redirect('Plan_It_Teknoy:index_view') 
 
 			elif 'btnForgotPass' in request.POST:
 				email = request.POST.get("email")
@@ -638,134 +740,122 @@ class SignUpTeacherView(View):
 			messages.info(request, 'Account already exists! Please try another unique one.', extra_tags='try')
 			return redirect('Plan_It_Teknoy:signupT_view')
 
+# Calendar View
 
-""" Strategy Design Pattern for Notifications Feature"""
-class IStrategy(ABC):
+def get_notifications(request):
+	config = configparser.ConfigParser()
 
-	@abstractmethod
-	def getNotifications(self):
-		"""to be implement in the child class"""
+	email = request.session['username']
+	password = request.session['password']
+	# config.read(['config.cfg', 'config.dev.cfg'])
+	config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+	'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+	'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+	'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+	'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+	'verificationUri' : 'https://microsoft.com/devicelogin',
+	'userCode' : 'TEKNOY',
+	'expiresOn' : '2022-12-30 09:26:03.478039',
+	'username': email,
+	'password': password,
+	'redirectUri' : 'http://localhost:8000/'}
+	azure_settings = config['azure']
 
-class Context():
+	graph: Graph = Graph(azure_settings)
 
-	_strategy = IStrategy
+	user = graph.get_user()
+	current_user = user['id']
+	confirm_user_id = Users(id_number=current_user)
 
-	def __init__(self, strategy:IStrategy) -> None:
-		self._strategy = strategy
-	
-	def implementNotifications(self):
-		return self._strategy.getNotifications()
+	present_time = datetime.now()
+	sender = User.objects.get(id = confirm_user_id.users_temp_id)
+	receiver = User.objects.get(id = confirm_user_id.users_temp_id)
 
+	dt_string = present_time.strftime("%Y-%m-%d %H:%M")
 
-class ConcreteStrategyFirstNotifications(IStrategy):
+	get_events = Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string)
 
-	# Notifications for event/s that is occuring/running'
-	def getNotifications(self):
-		user = graph.get_user()
-		current_user = user['id']
-		confirm_user_id = Users(id_number=current_user)
+	queryset  = Event.objects.values_list('title', flat=True).filter(StudentID=confirm_user_id,start_time__exact = dt_string)
 
-		present_time = datetime.now()
-		sender = User.objects.get(id = confirm_user_id.users_temp_id)
-		receiver = User.objects.get(id = confirm_user_id.users_temp_id)
+	# for event_title in queryset:
+	# 	get_title = event_title.title
 
-		dt_string = present_time.strftime("%Y-%m-%d %H:%M")
+	weeeeeee = str(queryset)
 
-		get_events = Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string)
-
-		queryset  = Event.objects.values_list('title', flat=True).filter(StudentID=confirm_user_id,start_time__exact = dt_string)
-
-		for eachEvent in queryset:
-			eventTitle = eachEvent
-
-		i = 0
-		while i != len(get_events):
-			if get_events:
-				message = "has just started." 
-				notify.send(sender,recipient=receiver,verb=eventTitle,description=message, timestamp = dt_string)
-				i += 1
-
-class ConcreteStrategySecondNotifications(IStrategy):
-
-	# Notifications for event/s that just finished/done/ended
-	def getNotifications(self):
-		user = graph.get_user()
-		current_user = user['id']
-		confirm_user_id = Users(id_number=current_user)
-
-		present_time = datetime.now()
-		sender = User.objects.get(id = confirm_user_id.users_temp_id)
-		receiver = User.objects.get(id = confirm_user_id.users_temp_id)
-
-		dt_string = present_time.strftime("%Y-%m-%d %H:%M")
-
-		get_events = Event.objects.filter(StudentID=confirm_user_id,end_time__exact = dt_string)
-
-		queryset  = Event.objects.values_list('title', flat=True).filter(StudentID=confirm_user_id,end_time__exact = dt_string)
-
-		for eachEvent in queryset:
-			eventTitle = eachEvent
-
-		i = 0
-		while i != len(get_events):
-			if get_events:
-				message = "has just ended." 
-				notify.send(sender,recipient=receiver,verb=eventTitle,description=message, timestamp = dt_string)
-				i += 1
+	i = 0
+	while i != len(get_events):
+		if get_events:
+			print("TITLE haha: ", weeeeeee)
+			message = "The event '"+weeeeeee+"' is already running seconds ago." 
+			notify.send(sender,recipient=receiver,verb='Event Running',description=message, timestamp = dt_string)
+			i += 1
 
 
 
 class CalendarViewNew(View):
 
 	def get(self, request):
+		if 'username' in request.session:
+			config = configparser.ConfigParser()
 
-		user = graph.get_user()
-		name = user['displayName']
-		form = EventForm(request.POST or None)
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
 
-		current_user = user['id']
-		check_teacher = Teachers.objects.filter(TeacherID=current_user)
-		check_student = Students.objects.filter(StudentID=current_user)
-		confirm_user_id = Users(id_number=current_user)
-		current_student = Students(StudentID=confirm_user_id)
-		running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
+			graph: Graph = Graph(azure_settings)
 
+			user = graph.get_user()
+			name = user['displayName']
+			form = EventForm(request.POST or None)
 
-		# Applying Notification Feature in this Class
-		contextOccuringEvents = Context(ConcreteStrategyFirstNotifications())
-		contextOccuringEvents.implementNotifications()
+			current_user = user['id']
+			check_teacher = Teachers.objects.filter(TeacherID=current_user)
+			check_student = Students.objects.filter(StudentID=current_user)
+			confirm_user_id = Users(id_number=current_user)
+			current_student = Students(StudentID=confirm_user_id)
+			running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
+			get_notifications(request)
 
+			#accessing all student records in the database
+			student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level, profile_pic FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
+			
+			student_running_events = []
 
-		# Applying Notification Feature in this Class
-		contextEndedEvents = Context(ConcreteStrategySecondNotifications())
-		contextEndedEvents.implementNotifications()
+			for student_event in running_events:
+				student_running_events.append(
+					{
+					"title":student_event.title,
+					"description": student_event.description,
+					"start":student_event.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+					"end":student_event.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+					}
+				)
 
-
-		#accessing all student records in the database
-		student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level, profile_pic FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
-		
-		student_running_events = []
-
-		for student_event in running_events:
-			student_running_events.append(
-				{
-				"title":student_event.title,
-				"description": student_event.description,
-				"start":student_event.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-				"end":student_event.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+			context = {
+				"student_running_events":student_running_events,  
+				"running_events":running_events, 
+				"form":form, "student_record":student_record, 
+				"check_teacher":check_teacher, 
+				"check_student": check_student, 
+				'name': name,
 				}
-			)
 
-		context = {
-			"student_running_events":student_running_events,  
-			"running_events":running_events, 
-			"form":form, "student_record":student_record, 
-			"check_teacher":check_teacher, 
-			"check_student": check_student, 
-			'name': name,
-			}
+			return render(request, 'calendarapp/calendar.html', context)
+		else:
+			return render(request, 'signin.html', {})
 
-		return render(request, 'calendarapp/calendar.html', context)
 
 	def post(self, request):
 		user = graph.get_user()        
@@ -778,8 +868,35 @@ class CalendarViewNew(View):
 			description = form2.cleaned_data["description"]
 			start_time = form2.cleaned_data["start_time"]
 			end_time = form2.cleaned_data["end_time"]
-			form2 = Event(StudentID = current_student.StudentID, title = title, description = description, start_time = start_time, end_time = end_time)		
+			form2 = Event(StudentID = current_student.StudentID, title = title, description = description, start_time = start_time, end_time = end_time)
+						
 			form2.save()
+
+			
+
+			present_time = datetime.now()
+			sender = User.objects.get(id = confirm_user_id.users_temp_id)
+			receiver = User.objects.get(id = confirm_user_id.users_temp_id)
+
+			# print(current_user)
+			# print(confirm_user_id)
+			# print(current_student)
+			# print(confirm_user_id.users_temp_id)
+			# print(receiver)
+
+			# get_all_events = Event.objects.filter(StudentID = current_student.StudentID, start_time__gt = datetime.now())
+
+			# print("Get All Events: ", get_all_events)
+			# print("Time now: ", datetime.now().date())
+			# print("Present time: ", present_time)
+			# print("LENGHT: ", len(get_all_events))
+
+			message = "Congratulations! You just created an event."
+			dt_string = present_time.strftime("%Y-%m-%d %H:%M")
+			notify.send(sender,recipient=receiver,verb='Event Running',description=message, timestamp = dt_string)
+			
+			# dt_string = now.strftime("%Y-%m-%d %H:%M")
+			# notify.send(sender,recipient=receiver,verb='Added New Event',description='You added a new event', timestamp = dt_string)
 			return redirect('Plan_It_Teknoy:calendar_view')
 				
 		else:
@@ -790,37 +907,59 @@ class CalendarViewNew(View):
 # DashboardView
 class DashboardView(View):
 	def get(self, request, *args, **kwargs):
-		form = EventForm(request.POST or None)
-		
-		user = graph.get_user()
-		name = user['displayName']
-		current_user = user['id']
+		if 'username' in request.session:
+			form = EventForm(request.POST or None)
+			config = configparser.ConfigParser()
 
-		confirm_user_id = Users(id_number=current_user)
-		check_teacher = Teachers.objects.filter(TeacherID=current_user)
-		check_student = Students.objects.filter(StudentID=current_user)
-		current_student = Students(StudentID=confirm_user_id)
-		event = Event.objects.filter(StudentID=current_student.StudentID)
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
 
-		# filter [Total Events, Running Events, Completed Events]
-		events = Event.objects.get_all_events(StudentID=current_student.StudentID)
-		running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
-		completed_events = Event.objects.get_completed_events(StudentID=current_student.StudentID)
-		
-		# accessing all student records in the database
-		student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
-		
-		context = {
-					"current_user": current_user,
-					"student_record" : student_record, "form":form, "event":event, "total_event": events,
-					"running_events": running_events,
-					"completed_events": completed_events,
-					"check_teacher": check_teacher,
-					"check_student": check_student,
-					'name': name,
-					}
+			graph: Graph = Graph(azure_settings)
 
-		return render(request, 'calendarapp/dashboard.html', context)
+			user = graph.get_user()
+			name = user['displayName']
+			current_user = user['id']
+
+			confirm_user_id = Users(id_number=current_user)
+			check_teacher = Teachers.objects.filter(TeacherID=current_user)
+			check_student = Students.objects.filter(StudentID=current_user)
+			current_student = Students(StudentID=confirm_user_id)
+			event = Event.objects.filter(StudentID=current_student.StudentID)
+
+			# filter [Total Events, Running Events, Completed Events]
+			events = Event.objects.get_all_events(StudentID=current_student.StudentID)
+			running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
+			completed_events = Event.objects.get_completed_events(StudentID=current_student.StudentID)
+			
+			# accessing all student records in the database
+			student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
+			
+			context = {
+						"current_user": current_user,
+						"student_record" : student_record, "form":form, "event":event, "total_event": events,
+						"running_events": running_events,
+						"completed_events": completed_events,
+						"check_teacher": check_teacher,
+						"check_student": check_student,
+						'name': name,
+						}
+
+			return render(request, 'calendarapp/dashboard.html', context)
+		else:
+			return render(request, 'signin.html', {})
 
 	def post(self, request):
 		if request.method == 'POST':
@@ -844,31 +983,53 @@ class AllEventsListView(ListView):
 	# """ All event list views """
 
 	def get(self, request):
+		if 'username' in request.session:
+			config = configparser.ConfigParser()
 
-		user = graph.get_user()
-		name = user['displayName']
-		current_user = user['id']
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
 
-		confirm_user_id = Users(id_number=current_user)
-		current_student = Students(StudentID=confirm_user_id)
-		events = Event.objects.get_all_events(StudentID=current_student.StudentID)
-		check_teacher = Teachers.objects.filter(TeacherID=current_user)
-		check_student = Students.objects.filter(StudentID=current_user)
+			graph: Graph = Graph(azure_settings)
+
+			user = graph.get_user()
+			name = user['displayName']
+			current_user = user['id']
+
+			confirm_user_id = Users(id_number=current_user)
+			current_student = Students(StudentID=confirm_user_id)
+			events = Event.objects.get_all_events(StudentID=current_student.StudentID)
+			check_teacher = Teachers.objects.filter(TeacherID=current_user)
+			check_student = Students.objects.filter(StudentID=current_user)
 
 
 
-		student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
+			student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
 
-		context = {
-			"student_record" : student_record, 
-			"total_event":events,
-			"events":events, 
-			"check_teacher":check_teacher, 
-			"check_student":check_student,
-			'name': name,
-			}
+			context = {
+				"student_record" : student_record, 
+				"total_event":events,
+				"events":events, 
+				"check_teacher":check_teacher, 
+				"check_student":check_student,
+				'name': name,
+				}
 
-		return render(request, 'calendarapp/events_list.html', context)
+			return render(request, 'calendarapp/events_list.html', context)
+		else:
+			return render(request, 'signin.html', {})
 		
 
 
@@ -878,73 +1039,117 @@ class RunningEventsListView(ListView):
 
 	
 	def get(self, request):
+		if 'username' in request.session:
+			config = configparser.ConfigParser()
 
-		user = graph.get_user()
-		name = user['displayName']
-		current_user = user['id']
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
 
-		confirm_user_id = Users(id_number=current_user)
-		current_student = Students(StudentID=confirm_user_id)
-		running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
-		check_teacher = Teachers.objects.filter(TeacherID=current_user)
-		check_student = Students.objects.filter(StudentID=current_user)
+			graph: Graph = Graph(azure_settings)
+
+			user = graph.get_user()
+			name = user['displayName']
+			current_user = user['id']
+
+			confirm_user_id = Users(id_number=current_user)
+			current_student = Students(StudentID=confirm_user_id)
+			running_events = Event.objects.get_running_events(StudentID=current_student.StudentID)
+			check_teacher = Teachers.objects.filter(TeacherID=current_user)
+			check_student = Students.objects.filter(StudentID=current_user)
 
 
-		# present_time = datetime.now()
-		# sender = User.objects.get(id = confirm_user_id.users_temp_id)
-		# receiver = User.objects.get(id = confirm_user_id.users_temp_id)
-	
-
-		# dt_string = present_time.strftime("%Y-%m-%d %H:%M")
-		# get_events = Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string)
-		# print("HAHAH: ", len(get_events))
-
-		# i = 0
-		# while i != len(get_events):
-		# 	if Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string):
-		# 		message = "One Event is already running seconds ago."
-		# 		notify.send(sender,recipient=receiver,verb='Event Running',description=message, timestamp = dt_string)
-		# 		i += 1
+			# present_time = datetime.now()
+			# sender = User.objects.get(id = confirm_user_id.users_temp_id)
+			# receiver = User.objects.get(id = confirm_user_id.users_temp_id)
 		
-		student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
-		
-		context = {
-			"student_record" : student_record, 
-			"events":running_events, 
-			"running_events":running_events, 
-			"check_teacher":check_teacher, 
-			"check_student":check_student,
-			'name': name,
-			}
 
-		return render(request, 'calendarapp/events_list.html', context)
+			# dt_string = present_time.strftime("%Y-%m-%d %H:%M")
+			# get_events = Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string)
+			# print("HAHAH: ", len(get_events))
+
+			# i = 0
+			# while i != len(get_events):
+			# 	if Event.objects.filter(StudentID=confirm_user_id,start_time__exact = dt_string):
+			# 		message = "One Event is already running seconds ago."
+			# 		notify.send(sender,recipient=receiver,verb='Event Running',description=message, timestamp = dt_string)
+			# 		i += 1
+			
+			student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
+			
+			context = {
+				"student_record" : student_record, 
+				"events":running_events, 
+				"running_events":running_events, 
+				"check_teacher":check_teacher, 
+				"check_student":check_student,
+				'name': name,
+				}
+
+			return render(request, 'calendarapp/events_list.html', context)
+		else:
+			return render(request, 'signin.html', {})
 
 class CompletedEventsListView(ListView):
 
 	def get(self, request):
+		if 'username' in request.session:
+			config = configparser.ConfigParser()
 
-		user = graph.get_user()
-		name = user['displayName']
-		current_user = user['id']
+			email = request.session['username']
+			password = request.session['password']
+			# config.read(['config.cfg', 'config.dev.cfg'])
+			config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+			'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+			'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+			'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+			'verificationUri' : 'https://microsoft.com/devicelogin',
+			'userCode' : 'TEKNOY',
+			'expiresOn' : '2022-12-30 09:26:03.478039',
+			'username': email,
+			'password': password,
+			'redirectUri' : 'http://localhost:8000/'}
+			azure_settings = config['azure']
 
-		confirm_user_id = Users(id_number=current_user)
-		current_student = Students(StudentID=confirm_user_id)
-		completed_events = Event.objects.get_completed_events(StudentID=current_student.StudentID)
-		check_teacher = Teachers.objects.filter(TeacherID=current_user)
-		check_student = Students.objects.filter(StudentID=current_user)
+			graph: Graph = Graph(azure_settings)
 
-		student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
-		
-		context = {
-			"student_record" : student_record, 
-			"events":completed_events, 
-			"completed_events":completed_events, 
-			"check_teacher":check_teacher, 
-			"check_student":check_student,
-			'name': name,
-			}
+			user = graph.get_user()
+			name = user['displayName']
+			current_user = user['id']
 
-		return render(request, 'calendarapp/events_list.html', context)
+			confirm_user_id = Users(id_number=current_user)
+			current_student = Students(StudentID=confirm_user_id)
+			completed_events = Event.objects.get_completed_events(StudentID=current_student.StudentID)
+			check_teacher = Teachers.objects.filter(TeacherID=current_user)
+			check_student = Students.objects.filter(StudentID=current_user)
+
+			student_record = Students.objects.raw('SELECT StudentID_id, first_name, program, last_name, year_level FROM plan_it_teknoy_students WHERE StudentID_id = %s', [current_student.StudentID])
+			
+			context = {
+				"student_record" : student_record, 
+				"events":completed_events, 
+				"completed_events":completed_events, 
+				"check_teacher":check_teacher, 
+				"check_student":check_student,
+				'name': name,
+				}
+
+			return render(request, 'calendarapp/events_list.html', context)
+		else:
+			return render(request, 'signin.html', {})
 
 # class NotificationsListView(ListView):
 
@@ -972,6 +1177,26 @@ class CompletedEventsListView(ListView):
 class SProfileSettings(View):
 
 	def get(self, request):
+
+		config = configparser.ConfigParser()
+
+		email = request.session['username']
+		password = request.session['password']
+		# config.read(['config.cfg', 'config.dev.cfg'])
+		config['azure'] = {'clientId': '0b89f8ff-7f30-471e-9e64-408604ee8002', 
+		'clientSecret': 'VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP',
+		'tenantId' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'authTenant' : '823cde44-4433-456d-b801-bdf0ab3d41fc',
+		'graphUserScopes' : 'User.Read Mail.Read Mail.Send',
+		'verificationUri' : 'https://microsoft.com/devicelogin',
+		'userCode' : 'TEKNOY',
+		'expiresOn' : '2022-12-30 09:26:03.478039',
+		'username': email,
+		'password': password,
+		'redirectUri' : 'http://localhost:8000/'}
+		azure_settings = config['azure']
+
+		graph: Graph = Graph(azure_settings)
 
 		user = graph.get_user()
 		current_user = user['id']
