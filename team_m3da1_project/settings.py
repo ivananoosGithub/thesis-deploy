@@ -164,11 +164,11 @@ CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1']
 MICROSOFT = {
     "app_id": "0b89f8ff-7f30-471e-9e64-408604ee8002",
     "app_secret": "VL98Q~MZX6QW6~yIu1x3ozto3ehJgEg0srU.JcCP",
-    "redirect": "https://web-production-434f.up.railway.app/microsoft_authentication/callback",
+    "redirect": "https://plan-it-teknoy.up.railway.app/microsoft_authentication/callback",
     "scopes": ["user.read"],
     "authority": "https://login.microsoftonline.com/823cde44-4433-456d-b801-bdf0ab3d41fc",  # or using tenant "https://login.microsoftonline.com/{tenant}",
     "valid_email_domains": ["cit.edu"],
-    "logout_uri": "https://web-production-434f.up.railway.app/"
+    "logout_uri": "https://plan-it-teknoy.up.railway.app/"
 }
 
 LOGIN_URL = "/microsoft_authentication/login"
