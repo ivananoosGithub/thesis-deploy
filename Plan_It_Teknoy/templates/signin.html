@@ -34,15 +34,16 @@
 		<div class="login-content">
 			<form id="form1" action="" method="POST" autocomplete="off" enctype="multipart/form-data">
 				{% csrf_token %}
-<!--            		<div class="input-div one">
-           		   <div class="i">
-           		   		<i class="fas fa-user"></i>
-           		   </div>
-           		   <div class="div">
-           		   		<h5>Student ID</h5>
-           		   		<input type="text" class="input" id="id_number" name ="id_number" required>
-           		   </div>
-           		</div> -->
+        <!-- dialog -->
+        <div class="dialog align-content-left" style="background-color: #004173; color: white;">
+          <div class="alert" style="text-align: left;" role="alert">
+            <!-- icon -->
+            <h5 class="alert-heading"><i class="fa-solid fa-exclamation" style="border: solid 2px white; padding: 5px; border-radius: 100%; padding-right: 13px;padding-left: 13px;"></i> Important</h5>
+            <p>Please use your microsoft login credentials when you log in. Rest assured that your login credentials will not be saved to our database; it will directly be authenticated using Microsoft&apos;s OAuth API.</p>
+          </div>
+        </div>
+        <!-- end -->
+        <br>
            		<div class="input-div pass">
            		   <div class="i"> 
            		    	<i class="fa fa-envelope"></i>
@@ -62,14 +63,22 @@
              <i class="fa-solid fa-eye" id="eye"></i>
 				 </div>
 			  </div>
-			  	<a class="forgot-pass" href="#" data-bs-toggle="modal" data-bs-target="#forgotPWModal">Forgot Password?</a>
-          <button type="submit" id="btnSignIn" name="btnSignIn" class="btn" value="Sign In">Sign In</button>
-				<span>Dont have an account?<a class="sign-up" href="{% url 'Plan_It_Teknoy:select_view' %}"> Sign Up</a></span>
-            </form>
+        <br>
+        <br>
+        
+        
+        <div class="ms-signin">
+            <br>
+            <div class="div">
+              <button type="submit" id="btnSignIn" name="btnSignIn" class="btn" value="Sign In" style="background-color: white; color: black; text-transform: none;"><i class="fa-brands fa-microsoft" style="margin-right: 30px;"></i><strong>Sign in with Microsoft</strong></button>
+           </div>
+        </div>
+          
+        </form>
         </div>
     </div>
     <!-- forgot pw modal -->
-    <form action="/index" id="form2" method="POST" autocomplete="off" enctype="multipart/form-data">
+    <form id="form2" method="POST" autocomplete="off" enctype="multipart/form-data">
       {% csrf_token %}
     <div class="modal fade" id="forgotPWModal" tabindex="-1" aria-labelledby="forgotPWModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
