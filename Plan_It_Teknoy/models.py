@@ -8,8 +8,12 @@ from django.contrib.auth.models import User
 from Plan_It_Teknoy import graph
 from .graph import Graph
 from notifications.signals import notify
+from django.conf import settings
 
 # Create your models here.
+from django.core.files.storage import FileSystemStorage
+
+upload_storage = FileSystemStorage(location=settings.UPLOAD_ROOT, base_url='/media')
 class Users(models.Model):
     users_temp_id = models.IntegerField(default=1)
     id_number = models.CharField(primary_key=True, unique=True, max_length = 100)
@@ -139,7 +143,7 @@ class DocumentGen(models.Model):
     DocumentID = models.AutoField(primary_key=True, unique=True)
     filename = models.CharField(max_length = 50, default="Not set")
     content = models.CharField(max_length=500)
-    doc_file = models.FileField(upload_to='docs/', null=True, default="Not set")
+    doc_file = models.FileField(upload_to='docs/', null=True, default="Not set", storage=upload_storage)
 
     class meta:
         db_table = 'DocumentGen'
