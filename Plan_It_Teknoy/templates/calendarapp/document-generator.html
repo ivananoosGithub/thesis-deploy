@@ -32,6 +32,7 @@
                                             <tr role="row">
                                                 <th class="sorting" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 300.312px; text-align: center;">Document Filename</th>
                                                 <th class="sorting_asc" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 85px; text-align: center;">Content</th>
+                                                <th class="sorting_asc" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 85px; text-align: center;">File</th>
                                                 <th class="sorting" tabindex="0" aria-controls="sampleTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: 30px; text-align: center;">Action</th>
                                             </tr>
                                         </thead>
@@ -42,6 +43,7 @@
                                                 <tr role="row" class="odd">
                                                     <td>{{ docs.filename }}</td>
                                                     <td>{{ docs.content }}</td>
+                                                    <td>{{ docs.doc_file }} </td>
                                                     <td>
                                                         <button class="btn btn-danger" data-toggle="modal" data-target="#viewDoc{{docs.DocumentID}}" style="width: 60px;">View</button>
                                                         <button class="btn btn-danger" data-toggle="modal" data-target="#deleteDoc{{docs.DocumentID}}" style="width: 60px;">Delete</button>
@@ -64,10 +66,12 @@
                                                         <div class="modal-body">
                                                             <div class="form-group">
                                                                 <!-- id for referencing -->
-                                                                <div hidden>
+                                                                <div>
                                                                     <label for="recipient-name" class="col-form-label">Document ID:</label>
                                                                     <input class="form-control-plaintext" type="text" id="docID" name="docID" value="{{ docs.DocumentID }}" readonly required>
-                                                                    <input class="form-control" type="text" id="docview" name="docview" value="{{ docs.filename }}.pdf" readonly>
+                                                                    <input class="form-control" type="text" id="docchanges" name="docchanges" value="{{ docs.content }}" readonly>
+                                                                    <input class="form-control" type="text" id="docfileopen" name="docfileopen" value="{{ docs.doc_file.path }}" readonly>
+                                                                    <input class="form-control" type="text" id="mychanges" name="mychanges"  required>                                                                    
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -145,7 +149,7 @@
                                 <label for="eventTitle" class="col-form-label" name="name" id="name">Filename:</label>
                                 <input class="form-control" type="text" id="docfilename" name="docfilename" value="" required>
                                 <!-- heading -->
-                                <label for="eventTitle" class="col-form-label" name="name" id="name">Heading:</label>
+                                <label for="eventTitle" class="col-form-label" name="name" id="name">Attributes to change:</label>
                                 <input class="form-control" type="text" id="docheading" name="docheading" value="" required>
                                 <!-- purpose -->
                                 <label for="message-text" class="col-form-label" name="purpose" id="purpose" >Purpose:</label>
@@ -155,6 +159,7 @@
                                 <input class="form-control" type="datetime-local" id="#" name="#" value="" required> -->
                             </div>
                             <div class="modal-footer">
+                                <input type="file" accept=".docx" id="docfile" name="docfile" required>
                                 <button type="submit" name="btnAddDoc" class="btn btn-warning">Save</button>
                             </div>
                         </form>

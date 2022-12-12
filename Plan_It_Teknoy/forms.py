@@ -28,7 +28,7 @@ class TeachersForm(forms.ModelForm):
 class DocumentsForm(forms.ModelForm):
     class Meta:
         model = DocumentGen
-        fields = ['DocumentID', 'filename', 'content']
+        fields = ['DocumentID', 'filename', 'content', 'doc_file']
         exclude = ['content']
 
 class ContactForm(forms.ModelForm):

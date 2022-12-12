@@ -43,6 +43,8 @@ import threading
 from docx import Document
 from docx.shared import Inches
 import webbrowser
+from django.core.files import File
+
 # pip install docx2pdf
 from docx2pdf import convert
 # file manipulation
@@ -139,6 +141,59 @@ def listToString(s):
 	
 	# return string  
 	return str1 
+
+# document generator replace string
+def paragraph_replace_text(paragraph, regex, replace_str):
+	"""Return `paragraph` after replacing all matches for `regex` with `replace_str`.
+
+	`regex` is a compiled regular expression prepared with `re.compile(pattern)`
+	according to the Python library documentation for the `re` module.
+	"""
+	# --- a paragraph may contain more than one match, loop until all are replaced ---
+	while True:
+		text = paragraph.text
+		match = regex.search(text)
+		if not match:
+			break
+
+		# --- when there's a match, we need to modify run.text for each run that
+		# --- contains any part of the match-string.
+		runs = iter(paragraph.runs)
+		start, end = match.start(), match.end()
+
+		# --- Skip over any leading runs that do not contain the match ---
+		for run in runs:
+			run_len = len(run.text)
+			if start < run_len:
+				break
+			start, end = start - run_len, end - run_len
+
+		# --- Match starts somewhere in the current run. Replace match-str prefix
+		# --- occurring in this run with entire replacement str.
+		run_text = run.text
+		run_len = len(run_text)
+		run.text = "%s%s%s" % (run_text[:start], replace_str, run_text[end:])
+		end -= run_len  # --- note this is run-len before replacement ---
+
+		# --- Remove any suffix of match word that occurs in following runs. Note that
+		# --- such a suffix will always begin at the first character of the run. Also
+		# --- note a suffix can span one or more entire following runs.
+		for run in runs:  # --- next and remaining runs, uses same iterator ---
+			if end <= 0:
+				break
+			run_text = run.text
+			run_len = len(run_text)
+			run.text = run_text[end:]
+			end -= run_len
+
+	# --- optionally get rid of any "spanned" runs that are now empty. This
+	# --- could potentially delete things like inline pictures, so use your judgement.
+	# for run in paragraph.runs:
+	#     if run.text == "":
+	#         r = run._r
+	#         r.getparent().remove(r)
+
+	return paragraph
 
 
 # (After Microsoft) Index View
@@ -403,31 +458,51 @@ class DocGenView(View):
 	def post(self,request):
 		if request.method == 'POST':
 			if 'btnAddDoc' in request.POST:
-				document = Document()
-				xl=win32com.client.Dispatch("Excel.Application",pythoncom.CoInitialize())
+				# document = Document()
+				# xl=win32com.client.Dispatch("Excel.Application",pythoncom.CoInitialize())
 
 
 				filename = request.POST.get('docfilename')
 				content = request.POST.get('doctext')
 				heading = request.POST.get('docheading', 0)
 
-				document.add_heading(heading)
-				document.add_paragraph(content)
-				file = document.save(filename + ".docx")
-				conv = filename + ".docx"
-				pdf = convert(conv)
+				# document.add_heading(heading)
+				# document.add_paragraph(content)
+				# file = document.save(filename + ".docx")
+				# conv = filename + ".docx"
+				# pdf = convert(conv)
 
 				add_doc = DocumentGen()
 				add_doc.filename = filename
-				add_doc.content = content
-				add_doc.doc_file = request.FILES['pdf']
+				add_doc.content = heading
+				add_doc.doc_file = request.FILES['docfile']
 				add_doc.save()       
 
 				return redirect('Plan_It_Teknoy:docgen_view')
 			if 'btnViewDocument' in request.POST:
-				getfile = request.POST.get('docview')
+				
+				docid = request.POST.get('docID')
+				changes = request.POST.get('docchanges')
+				testtwo = str(changes)
+				changesfinal = testtwo.split(", ")
+				newchanges = request.POST.get('mychanges')
+				testone = str(newchanges)
+				mychanges = testone.split(", ")
+				iteration = 0
+
+				DocumentGen.objects.filter(DocumentID = docid)
+				docu = request.POST.get('docfileopen')
+				docum = settings.MEDIA_URL + docu
+				document = Document(docu)
+				for x in changesfinal:
+					regex = re.compile(changesfinal[iteration])
+					for paragraph in document.paragraphs:
+						paragraph_replace_text(paragraph, regex, mychanges[iteration])
+						iteration+=1
+				file = document.save("newtest.docx")
+				# getfile = request.POST.get('docview')
 				# temporary file browsing / please replace to local drive when using
-				webbrowser.open_new_tab(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
+				# webbrowser.open_new_tab(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
 				return redirect('Plan_It_Teknoy:docgen_view')
 
 			if 'btnDeleteDocument' in request.POST:
@@ -436,8 +511,8 @@ class DocGenView(View):
 				docdeletefile = request.POST.get('docdelete')
 				DocumentGen.objects.filter(DocumentID = docdeletefile).delete()
 				# local drive, please change appropriately
-				os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
-				os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile2}')
+				# os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile}')
+				# os.remove(f'D:/School 4th year/Capstone/M3DA1-Plant-it-Teknoy/team_m3da1_project/{getfile2}')
 				return redirect('Plan_It_Teknoy:docgen_view')
 
 
@@ -877,7 +952,7 @@ class CalendarViewNew(View):
 		azure_settings = config['azure']
 
 		graph: Graph = Graph(azure_settings)
-		user = graph.get_user()          
+		user = graph.get_user()        
 		form2 = EventForm(request.POST or None)        
 		if request.POST and form2.is_valid():
 			current_user = user['id']

@@ -139,6 +139,7 @@ class DocumentGen(models.Model):
     DocumentID = models.AutoField(primary_key=True, unique=True)
     filename = models.CharField(max_length = 50, default="Not set")
     content = models.CharField(max_length=500)
+    doc_file = models.FileField(upload_to='docs/', null=True, default="Not set")
 
     class meta:
         db_table = 'DocumentGen'
